@@ -1,8 +1,11 @@
-install:
-  - choco install gitversion.portable -pre -y
-
+image:
+  - Visual Studio 2017
+  - Ubuntu
 assembly_info:
   patch: false
+
+environment:
+  APPVEYOR_YML_DISABLE_PS_LINUX: true
 
 platform:
   - Any CPU
@@ -11,11 +14,8 @@ configuration:
   - Debug
  
 build_script:
-  - cmd: nuget restore src\
-  - cmd: gitversion /l console /output buildserver /updateAssemblyInfo
-  
-  - cmd: msbuild src\Shouldly.sln "/p:Configuration=%CONFIGURATION%;Platform=%PLATFORM%"
-  
-  - cmd: ECHO nuget pack Shouldly.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
-  - cmd: nuget pack Shouldly.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
-  - cmd: appveyor PushArtifact "Shouldly.%GitVersion_NuGetVersion%.nupkg"
+  - ps: ./build.ps1
+  - sh: ./build.sh
+
+test: off
+skip_tags: true
